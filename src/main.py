@@ -1,7 +1,8 @@
 from classdefs import *
 from serialize import *
 from sys import getsizeof
-
+from io import BytesIO
+from parse import *
 def main():
     msg = Message(
         Header(
@@ -13,7 +14,7 @@ def main():
             ARCOUNT=0),
         Question(
             QNAME='superuser.com',
-            QTYPE=Type.AAAA,
+            QTYPE=Type.A,
             QCLASS=Class.IN),
         None, # No Answer field in query
         None, # No Authority field in query
@@ -23,6 +24,10 @@ def main():
     response = send_udp_message(byte_string_to_send, '8.8.8.8', 53)
     print(getsizeof(response))
     print(response)
+    
+    reader = BytesIO(response)
+    print(parse_header(reader))
+    print(parse_question(reader))
 
 if __name__ == '__main__':
     main()
