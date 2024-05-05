@@ -79,23 +79,11 @@ class ResourceRecord:
     RDATA: str
 
 @dataclass
-class Answer:
-    RRs: list[ResourceRecord]
-
-@dataclass
-class Authority:
-    RRs: list[ResourceRecord]
-
-@dataclass
-class Additional:
-    RRs: list[ResourceRecord]
-
-@dataclass
 class Message:
     _Header: Header
     _Question: Question
-    _Answer: Answer
-    _Authority: Authority
-    _Additional: Additional
+    _Answer: list[ResourceRecord]
+    _Authority: list[ResourceRecord]
+    _Additional: list[ResourceRecord]
 
 
