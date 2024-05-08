@@ -1,3 +1,4 @@
+import argparse
 from classdefs import *
 from serialize import *
 from sys import getsizeof
@@ -49,8 +50,12 @@ def build_query(domain_name, qtype):
     return byte_string_to_send
 
 def main():
-    
-    ip = lookup_domain("www.superuser.com", Type.A)
+    parser = argparse.ArgumentParser(description='DNS Query Tool')
+    parser.add_argument('domain_name', type=str, help='The domain name to resolve')
+    parser.add_argument('--qt', type=str, default='A', help='The type of DNS query to send')
+    args = parser.parse_args()
+
+    ip = lookup_domain(args.domain_name, Type[args.qt.upper()])
     print(ip)
     
 
