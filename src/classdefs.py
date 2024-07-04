@@ -62,6 +62,8 @@ class Header:
     ANCOUNT: int
     NSCOUNT: int
     ARCOUNT: int
+    def get_rcode(self):
+        return self.flags & 0x000F
 
 @dataclass
 class Question:

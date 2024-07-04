@@ -8,12 +8,6 @@ def parse_header(reader):
     items = struct.unpack('!HHHHHH', reader.read(12))
     return Header(*items)
 
-# def decode_name_simple(reader):
-#     parts = []
-#     while (length := reader.read(1)[0]) != 0:
-#         parts.append(reader.read(length))
-#     return b'.'.join(parts)
-
 def parse_question(reader):
     name = decode_name(reader)
     data = reader.read(4)
@@ -23,7 +17,7 @@ def parse_question(reader):
 def decode_only_name(name_bytes):
     parts = []
     i = 0
-    while length := name_bytes[i] != 0:
+    while (length := name_bytes[i]) != 0:
         if length & 0b1100_0000:
             pointer_bytes = bytes([length & 0b0011_1111]) + name_bytes[i+1:i+2]
             pointer = struct.unpack("!H", pointer_bytes)[0]
@@ -57,11 +51,22 @@ def decode_compressed_name(length, reader):
     reader.seek(current_pos)
     return result
 
+def ip_to_string(ip_bytes):
+    return ".".join(str(byte) for byte in ip_bytes)
+
 def parse_record(reader):
     name = decode_name(reader)
     data = reader.read(10)
     type_, class_, ttl, data_len = struct.unpack("!HHIH", data)
-    data = reader.read(data_len)
+    if type_ == Type.NS.value:
+        data = decode_name(reader)
+    elif type_ == Type.A.value:
+        data = ip_to_string(reader.read(data_len))
+    elif type_ == Type.AAAA.value:
+        raw_address = reader.read(16)  # Read 16 bytes for IPv6
+        data = ':'.join(format(x, '02x') for x in struct.unpack('!8H', raw_address))
+    else:
+        data = reader.read(data_len)    
     return ResourceRecord(name, type_, class_, ttl, data_len, data)
 
 def parse_dns_packet(data):
