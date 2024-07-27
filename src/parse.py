@@ -45,10 +45,13 @@ def decode_name(reader):
 def decode_compressed_name(length, reader):
     pointer_bytes = bytes([length & 0b0011_1111]) + reader.read(1)
     pointer = struct.unpack("!H", pointer_bytes)[0]
+    # print(pointer_bytes)
+    # print(pointer)
     current_pos = reader.tell()
     reader.seek(pointer)
     result = decode_name(reader)
     reader.seek(current_pos)
+    # print(result)
     return result
 
 def ip_to_string(ip_bytes):
